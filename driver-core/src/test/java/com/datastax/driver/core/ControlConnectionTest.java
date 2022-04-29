@@ -42,6 +42,7 @@ import com.google.common.collect.Maps;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -299,7 +300,9 @@ public class ControlConnectionTest extends CCMTestsSupport {
     }
 
     StringBuilder columnDataBuilder = new StringBuilder();
-    for (String column : columns.split(",")) {
+    String[] splitColumns = columns.split(",");
+    Set<String> splitColumnsSet = new HashSet<String>(Arrays.asList(splitColumns));
+    for (String column : splitColumns) {
       builder = builder.forcePeerInfo(1, 2, column, null);
       columnDataBuilder.append(String.format("%s=null, ", column));
     }
@@ -334,11 +337,31 @@ public class ControlConnectionTest extends CCMTestsSupport {
       cluster.init();
 
       InetAddress node2Address = scassandraCluster.address(2).getAddress();
-      String expectedError =
-          String.format(
-              "Found invalid row in system.peers: [peer=%s, %s]. "
-                  + "This is likely a gossip or snitch issue, this host will be ignored.",
-              node2Address, columnData);
+      String expectedError;
+      // Based on ControlConnection::formatInvalidPeer
+      if (withPeersV2) {
+        expectedError =
+            String.format(
+                "Found invalid row in system.peers: [peer=%s, %s]. "
+                    + "This is likely a gossip or snitch issue, this host will be ignored.",
+                node2Address, columnData);
+      } else {
+        expectedError =
+            String.format(
+                "Found invalid row in system.peers: [peer=%s, %s%s%s%s]. "
+                    + "This is likely a gossip or snitch issue, this host will be ignored.",
+                node2Address,
+                !splitColumnsSet.contains("native_transport_address")
+                    ? "missing native_transport_address, "
+                    : "",
+                !splitColumnsSet.contains("native_transport_port")
+                    ? "missing native_transport_port, "
+                    : "",
+                !splitColumnsSet.contains("native_transport_port_ssl")
+                    ? "missing native_transport_port_ssl, "
+                    : "",
+                columnData);
+      }
       String log = logs.get();
       // then: A peer with a null rack should not show up in host metadata, unless allowed via
       // system property.
