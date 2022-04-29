@@ -77,7 +77,7 @@ public class ExceptionsScassandraTest extends ScassandraTestBase {
       fail("expected a ReadTimeoutException");
     } catch (ReadTimeoutException e) {
       assertThat(e.getMessage())
-          .isEqualTo(
+          .contains(
               "Cassandra timeout during read query at consistency LOCAL_ONE (1 responses were required but only 0 replica responded)");
       assertThat(e.getConsistencyLevel()).isEqualTo(LOCAL_ONE);
       assertThat(e.getReceivedAcknowledgements()).isEqualTo(0);
