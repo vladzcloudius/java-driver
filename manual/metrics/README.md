@@ -38,7 +38,7 @@ To do this in a maven project:
 <dependency>
   <groupId>com.scylladb</groupId>
   <artifactId>scylla-driver-core</artifactId>
-  <version>3.11.0.0</version>
+  <version>3.11.2.0</version>
   <exclusions>
     <exclusion>
       <groupId>io.dropwizard.metrics</groupId>

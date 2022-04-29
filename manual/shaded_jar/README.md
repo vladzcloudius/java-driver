@@ -12,7 +12,7 @@ package name:
 <dependency>
   <groupId>com.scylladb</groupId>
   <artifactId>scylla-driver-core</artifactId>
-  <version>3.11.0.0</version>
+  <version>3.11.2.0</version>
   <classifier>shaded</classifier>
   <!-- Because the shaded JAR uses the original POM, you still need
        to exclude this dependency explicitly: -->
@@ -32,7 +32,7 @@ non-shaded JAR:
 <dependency>
   <groupId>com.scylladb</groupId>
   <artifactId>scylla-driver-core</artifactId>
-  <version>3.11.0.0</version>
+  <version>3.11.2.0</version>
   <classifier>shaded</classifier>
   <exclusions>
     <exclusion>
@@ -44,7 +44,7 @@ non-shaded JAR:
 <dependency>
   <groupId>com.scylladb</groupId>
   <artifactId>scylla-driver-mapping</artifactId>
-  <version>3.11.0.0</version>
+  <version>3.11.2.0</version>
   <exclusions>
     <exclusion>
       <groupId>com.scylladb</groupId>

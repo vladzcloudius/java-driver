@@ -18,83 +18,48 @@ package com.datastax.driver.core.exceptions;
 import com.datastax.driver.core.ConsistencyLevel;
 import com.datastax.driver.core.EndPoint;
 
-/** A Cassandra timeout during a read query. */
-public class ReadTimeoutException extends QueryConsistencyException {
+public class CASWriteUnknownException extends QueryConsistencyException {
 
   private static final long serialVersionUID = 0;
-
-  private final boolean dataPresent;
 
   /**
    * This constructor should only be used internally by the driver when decoding error responses.
    */
-  public ReadTimeoutException(
-      ConsistencyLevel consistency, int received, int required, boolean dataPresent) {
-    this(null, consistency, received, required, dataPresent);
+  public CASWriteUnknownException(ConsistencyLevel consistency, int received, int required) {
+    this(null, consistency, received, required);
   }
 
-  public ReadTimeoutException(
-      EndPoint endPoint,
-      ConsistencyLevel consistency,
-      int received,
-      int required,
-      boolean dataPresent) {
+  public CASWriteUnknownException(
+      EndPoint endPoint, ConsistencyLevel consistency, int received, int required) {
     super(
         endPoint,
         String.format(
-            "Cassandra timeout during read query at consistency %s (%s). "
-                + "In case this was generated during read repair, the consistency level is not representative of the actual consistency.",
-            consistency, formatDetails(received, required, dataPresent)),
+            "CAS operation result is unknown - proposal was not accepted by a quorum. (%d / %d)",
+            received, required),
         consistency,
         received,
         required);
-    this.dataPresent = dataPresent;
   }
 
-  private ReadTimeoutException(
+  private CASWriteUnknownException(
       EndPoint endPoint,
       String msg,
       Throwable cause,
       ConsistencyLevel consistency,
       int received,
-      int required,
-      boolean dataPresent) {
+      int required) {
     super(endPoint, msg, cause, consistency, received, required);
-    this.dataPresent = dataPresent;
-  }
-
-  private static String formatDetails(int received, int required, boolean dataPresent) {
-    if (received < required)
-      return String.format(
-          "%d responses were required but only %d replica responded", required, received);
-    else if (!dataPresent) return "the replica queried for data didn't respond";
-    else return "timeout while waiting for repair of inconsistent replica";
-  }
-
-  /**
-   * Whether the actual data was amongst the received replica responses.
-   *
-   * <p>During reads, Cassandra doesn't request data from every replica to minimize internal network
-   * traffic. Instead, some replicas are only asked for a checksum of the data. A read timeout may
-   * have occurred even if enough replicas have responded to fulfill the consistency level, if only
-   * checksum responses have been received. This method allows to detect that case.
-   *
-   * @return whether the data was amongst the received replica responses.
-   */
-  public boolean wasDataRetrieved() {
-    return dataPresent;
   }
 
   @Override
-  public ReadTimeoutException copy() {
-    return new ReadTimeoutException(
+  public CASWriteUnknownException copy() {
+    return new CASWriteUnknownException(
         getEndPoint(),
         getMessage(),
         this,
         getConsistencyLevel(),
         getReceivedAcknowledgements(),
-        getRequiredAcknowledgements(),
-        wasDataRetrieved());
+        getRequiredAcknowledgements());
   }
 
   /**
@@ -114,14 +79,13 @@ public class ReadTimeoutException extends QueryConsistencyException {
    * @return a copy/clone of this exception, but with the given host address instead of the original
    *     one.
    */
-  public ReadTimeoutException copy(EndPoint endPoint) {
-    return new ReadTimeoutException(
+  public CASWriteUnknownException copy(EndPoint endPoint) {
+    return new CASWriteUnknownException(
         endPoint,
         getMessage(),
         this,
         getConsistencyLevel(),
         getReceivedAcknowledgements(),
-        getRequiredAcknowledgements(),
-        wasDataRetrieved());
+        getRequiredAcknowledgements());
   }
 }
