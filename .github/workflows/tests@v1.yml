@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 10
 
     strategy:
@@ -33,7 +33,7 @@ jobs:
 
   verify:
     name: Full verify
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 10
 
     strategy:
@@ -56,7 +56,7 @@ jobs:
 
   unit-tests:
     name: Unit tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 10
 
     steps:
@@ -88,7 +88,7 @@ jobs:
 
   setup-integration-tests:
     name: Setup ITs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     timeout-minutes: 2
 
     steps:
@@ -113,7 +113,7 @@ jobs:
 
   cassandra-integration-tests:
     name: Cassandra ITs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [setup-integration-tests]
     timeout-minutes: 90
 
@@ -170,7 +170,7 @@ jobs:
 
   scylla-integration-tests:
     name: Scylla ITs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [setup-integration-tests]
     timeout-minutes: 90
 
