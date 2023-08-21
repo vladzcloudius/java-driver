@@ -13,7 +13,7 @@ The module is published as a separate Maven artifact:
 <dependency>
   <groupId>com.scylladb</groupId>
   <artifactId>scylla-driver-extras</artifactId>
-  <version>3.11.2.0</version>
+  <version>3.11.4.0</version>
 </dependency>
 ```
 
