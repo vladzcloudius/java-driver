@@ -26,30 +26,21 @@
     <parent>
         <groupId>com.scylladb</groupId>
         <artifactId>scylla-driver-tests-parent</artifactId>
-        <version>3.11.4.1-SNAPSHOT</version>
+        <version>3.11.5.0-SNAPSHOT</version>
     </parent>
 
+    <packaging>pom</packaging>
     <artifactId>scylla-driver-tests-osgi</artifactId>
     <name>Java Driver for Scylla and Apache Cassandra Tests - OSGi</name>
     <description>A test for the Java Driver in an OSGi container.</description>
 
+    <modules>
+        <module>common</module>
+        <module>shaded</module>
+        <module>unshaded</module>
+    </modules>
+
     <dependencies>
-
-        <dependency>
-            <groupId>com.scylladb</groupId>
-            <artifactId>scylla-driver-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.jnr</groupId>
-                    <artifactId>jnr-ffi</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.github.jnr</groupId>
-                    <artifactId>jnr-posix</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
         <dependency>
             <groupId>com.scylladb</groupId>
             <artifactId>scylla-driver-mapping</artifactId>
@@ -63,11 +54,6 @@
         <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-core</artifactId>
         </dependency>
 
         <dependency>
@@ -167,7 +153,7 @@
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
-                    <skip>${test.osgi.skip}</skip>
+                    <skip>true</skip>
                     <systemPropertyVariables>
                         <cassandra.version>${cassandra.version}</cassandra.version>
                         <!-- pull in declared version properties, this ensures we test with the same versions used by the driver -->
@@ -184,30 +170,19 @@
                         <jackson.version>${jackson.version}</jackson.version>
                         <jackson-databind.version>${jackson-databind.version}</jackson-databind.version>
                         <ipprefix>${ipprefix}</ipprefix>
+                        <org.ops4j.pax.url.mvn.useFallbackRepositories>false</org.ops4j.pax.url.mvn.useFallbackRepositories>
+                        <!-- repo1.maven.org requires https but the old version of pax-exam we use hard-codes http -->
+                        <org.ops4j.pax.url.mvn.repositories>https://repo1.maven.org/maven2@id=central</org.ops4j.pax.url.mvn.repositories>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
 
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
                 <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>com.datastax.driver.osgi</Bundle-SymbolicName>
-                        <Export-Package>com.datastax.driver.osgi.api,!com.datastax.driver.osgi.impl</Export-Package>
-                        <Bundle-Activator>com.datastax.driver.osgi.impl.Activator</Bundle-Activator>
-                        <_include>-osgi.bnd</_include>
-                    </instructions>
+                    <skip>true</skip>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>bundle-manifest</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>manifest</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
         </plugins>
