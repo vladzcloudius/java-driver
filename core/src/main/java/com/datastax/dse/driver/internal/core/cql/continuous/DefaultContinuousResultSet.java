@@ -103,15 +103,19 @@ public class DefaultContinuousResultSet implements ContinuousResultSet {
     }
 
     private void maybeMoveToNextPage() {
-      if (!cancelled && !currentRows.hasNext() && currentPage.hasMorePages()) {
-        BlockingOperation.checkNotDriverThread();
-        ContinuousAsyncResultSet nextPage =
-            CompletableFutures.getUninterruptibly(currentPage.fetchNextPage());
-        currentPage = nextPage;
-        remaining += currentPage.remaining();
-        currentRows = nextPage.currentPage().iterator();
-        executionInfos.add(nextPage.getExecutionInfo());
-      }
+      do {
+        if (!cancelled && !currentRows.hasNext() && currentPage.hasMorePages()) {
+          BlockingOperation.checkNotDriverThread();
+          ContinuousAsyncResultSet nextPage =
+              CompletableFutures.getUninterruptibly(currentPage.fetchNextPage());
+          currentPage = nextPage;
+          remaining += currentPage.remaining();
+          currentRows = nextPage.currentPage().iterator();
+          executionInfos.add(nextPage.getExecutionInfo());
+        } else {
+          break;
+        }
+      } while (currentPage.remaining() <= 0);
     }
 
     private boolean isFullyFetched() {
